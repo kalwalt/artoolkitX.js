@@ -273,6 +273,31 @@ import artoolkitXjs from "./artoolkitx.js";
             trackableId = artoolkitXjs.addTrackable(
                 `${trackableObj.trackableType};${fileName}`
             );
+        } else if (trackableObj.trackableType.includes("2D")) {
+          console.log("we are 2d");
+          try{
+            fileName = await _loadTrackable(trackableObj.url);
+            console.log(fileName);
+          } catch (e) {
+            throw "Error to load trackable: " + e;
+        }
+            trackableId = artoolkitXjs.addTrackable(
+                trackableObj.trackableType + ";" + fileName + ";" + trackableObj.height
+            );
+        } else if (trackableObj.trackableType.includes("NFT")) {
+          console.log("we are in NFT");
+          try{
+            fileName = await  _loadTrackable(trackableObj.url);
+            console.log(fileName);
+          } catch (e) {
+            throw "Error to load trackable: " + e;
+        }
+            if (!this._patternDetection.template) {
+                this._patternDetection.template = true;
+                }
+            trackableId = artoolkitXjs.addTrackable(
+                trackableObj.trackableType + ";" + fileName + ";" + trackableObj.height
+            );
         }
 
         if (trackableId >= 0) {
