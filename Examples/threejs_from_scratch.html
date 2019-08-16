@@ -130,7 +130,6 @@ var camera_mat = new Float64Array(16);
 					interval = setInterval(function() {
 							
 							arController.process(video);
-							camera_mat = arController.getCameraMatrix(0, 1000);
 					}, 13);
 					ar1 = arController;
 					
@@ -148,7 +147,7 @@ function tick() {
 	if (!arController) {
 		return;
 	}
-
+	arController.getCameraMatrix(0.0, 1000.0, camera_mat);
 	//var markerNum = arController.getMarkerNum();
 	var markerNum=1;
 	if (markerNum > 0) {
@@ -168,8 +167,6 @@ function tick() {
 	} else {
 		markerRoot.visible = false;
 	}
-	
-	console.log(camera_mat);
 
 	// Render the scene.
 	renderer.autoClear = false;

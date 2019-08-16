@@ -409,8 +409,8 @@ import artoolkitXjs from "./artoolkitx.js";
      *
      * @return {Float32Array} The 16-element WebGL camera matrix for the ARController camera parameters.
      */
-    ARController.prototype.getCameraMatrix = function (nearPlane, farPlane) {
-        return artoolkitXjs._arwGetProjectionMatrix(nearPlane, farPlane);
+    ARController.prototype.getCameraMatrix = function (nearPlane, farPlane, matrix) {
+        return artoolkitXjs._arwGetProjectionMatrix(nearPlane, farPlane, matrix);
     };
 
     /* Setter / Getter Proxies */
