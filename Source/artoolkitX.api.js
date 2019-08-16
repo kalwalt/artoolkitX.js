@@ -298,6 +298,10 @@ import artoolkitXjs from "./artoolkitx.js";
     ARController.prototype.getTransMatSquare = function (trackableUID) {
         return this._queryTrackableVisibility(trackableUID);
     };
+    //to be finished
+    ARController.prototype.getTransMatSquareCont = function (id, markerIndex, markerWidth, previousMarkerTransform, dst) {
+      return artoolkitXjs.getTransMatSquareCont(id, markerIndex, markerWidth)
+    }
 
     // /**
     //  * T.B.: Make this function static as it is a util function and doesn't manipulate the ARController object (this)

@@ -152,8 +152,8 @@ function tick() {
 	var markerNum=1;
 	if (markerNum > 0) {
 		if (markerRoot.visible) {
-			//arController.getTransMatSquareCont(0, 1, markerRoot.markerMatrix, markerRoot.markerMatrix);
-			arController.getTransMatSquare(0 /* Marker index */, 1 /* Marker width */, markerRoot.markerMatrix);
+			arController.getTransMatSquareCont(0, 0, 1, markerRoot.markerMatrix, markerRoot.markerMatrix);
+			//arController.getTransMatSquare(0 /* Marker index */, 1 /* Marker width */, markerRoot.markerMatrix);
 		} else {
 			arController.getTransMatSquare(0 /* Marker index */, 1 /* Marker width */, markerRoot.markerMatrix);
 		}
