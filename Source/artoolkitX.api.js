@@ -301,7 +301,11 @@ import artoolkitXjs from "./artoolkitx.js";
     //to be finished
     ARController.prototype.getTransMatSquareCont = function (id, markerIndex, markerWidth, previousMarkerTransform, dst) {
       return artoolkitXjs.getTransMatSquareCont(id, markerIndex, markerWidth)
-    }
+    };
+
+    ARController.prototype.getTransformationData = function (trackableUID) {
+      return this.trackables[trackableUID].transformation;
+    };
 
     // /**
     //  * T.B.: Make this function static as it is a util function and doesn't manipulate the ARController object (this)

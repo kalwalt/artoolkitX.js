@@ -93,7 +93,7 @@ scene.add(light);
 var markerRoot = new THREE.Object3D();
 
 markerRoot.wasVisible = false;
-markerRoot.markerMatrix = new Float64Array(12);
+markerRoot.markerMatrix = new Float64Array(16);
 markerRoot.matrixAutoUpdate = false;
 camera.matrixAutoUpdate = false;
 
@@ -113,12 +113,13 @@ scene.add(markerRoot);
 
 var video = document.getElementById('v');
 var arController = new ARController(video, cameraParam);
+//var trackableInfo;
 
 window.addEventListener('artoolkitX-loaded', () => {
 var camera_mat = new Float64Array(16);
 	arController.addEventListener('getMarker', (trackableInfo) => {
 			console.log("TrackableID: " + trackableInfo.data.trackableId);
-			console.log(trackableInfo.data.transformation);
+			//console.log(trackableInfo.data.transformation);
 	});
 
 	try {
@@ -126,20 +127,20 @@ var camera_mat = new Float64Array(16);
 			arController.start().then( () => {
 					console.log("start done");
 					var trackableId = arController.addTrackable(trackable);
-					
 					interval = setInterval(function() {
-							
+
 							arController.process(video);
+							arController.getCameraMatrix(0.0, 1000.0, camera_mat);
 					}, 13);
 					ar1 = arController;
-					
+
 			});
 
 	}
 	catch (e) {
 			console.log(e);
 	}
-	
+
 // On every frame do the following:
 function tick() {
 	requestAnimationFrame(tick);
@@ -147,38 +148,33 @@ function tick() {
 	if (!arController) {
 		return;
 	}
-	arController.getCameraMatrix(0.0, 1000.0, camera_mat);
+
 	//var markerNum = arController.getMarkerNum();
 	var markerNum=1;
 	if (markerNum > 0) {
-		if (markerRoot.visible) {
-			arController.getTransMatSquareCont(0, 0, 1, markerRoot.markerMatrix, markerRoot.markerMatrix);
-			//arController.getTransMatSquare(0 /* Marker index */, 1 /* Marker width */, markerRoot.markerMatrix);
-		} else {
-			arController.getTransMatSquare(0 /* Marker index */, 1 /* Marker width */, markerRoot.markerMatrix);
-		}
+
 		markerRoot.visible = true;
 		if (USE_SHADER) {
-            arController.arglCameraViewRHf(arController.transMatToGLMat(markerRoot.markerMatrix), shaderMaterial.uniforms.transformationMatrix.value.elements);
+					shaderMaterial.uniforms.transformationMatrix.value.elements = arController.getTransformationData(0);
 		} else {
-            arController.arglCameraViewRHf(arController.transMatToGLMat(markerRoot.markerMatrix), markerRoot.matrix.elements);
-        }
+					markerRoot.matrix.elements = arController.getTransformationData(0);
+				}
 
 	} else {
 		markerRoot.visible = false;
 	}
 
-	// Render the scene.
-	renderer.autoClear = false;
-	renderer.clear();
-	renderer.render(scene, camera);
-	
 	if (USE_SHADER) {
 		shaderMaterial.uniforms.cameraMatrix.value.fromArray(camera_mat);
 	} else {
 		camera.projectionMatrix.fromArray(camera_mat);
 	}
 }
+
+	// Render the scene.
+	renderer.autoClear = false;
+	renderer.clear();
+	renderer.render(scene, camera);
 
 	tick();
 
