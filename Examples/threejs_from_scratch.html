@@ -116,7 +116,7 @@ var arController = new ARController(video, cameraParam);
 //var trackableInfo;
 
 window.addEventListener('artoolkitX-loaded', () => {
-var camera_mat = new Float64Array(16);
+var camera_mat = new Float32Array(16);
 	arController.addEventListener('getMarker', (trackableInfo) => {
 			console.log("TrackableID: " + trackableInfo.data.trackableId);
 			//console.log(trackableInfo.data.transformation);
@@ -130,9 +130,29 @@ var camera_mat = new Float64Array(16);
 					interval = setInterval(function() {
 
 							arController.process(video);
-							arController.getCameraMatrix(0.0, 1000.0, camera_mat);
+
 					}, 13);
 					ar1 = arController;
+					arController.debugSetup();
+					var markerNum=1;
+					if (markerNum > 0) {
+					markerRoot.visible = true;
+					if (USE_SHADER) {
+								arController.arglCameraViewRHf(arController.transMatToGLMat(arController.getTransformationData(0)), shaderMaterial.uniforms.transformationMatrix.value.elements);
+					} else {
+								arController.arglCameraViewRHf(arController.transMatToGLMat(arController.getTransformationData(0)), markerRoot.matrix.elements);
+							}
+
+				} else {
+					markerRoot.visible = false;
+				}
+				arController.getCameraMatrix(0.0, 100.0, camera_mat);
+				if (USE_SHADER) {
+					//console.log(camera_mat);
+					shaderMaterial.uniforms.cameraMatrix.value.fromArray(camera_mat);
+				} else {
+					camera.projectionMatrix.fromArray(camera_mat);
+				}
 
 			});
 
@@ -148,27 +168,6 @@ function tick() {
 	if (!arController) {
 		return;
 	}
-
-	//var markerNum = arController.getMarkerNum();
-	var markerNum=1;
-	if (markerNum > 0) {
-
-		markerRoot.visible = true;
-		if (USE_SHADER) {
-					shaderMaterial.uniforms.transformationMatrix.value.elements = arController.getTransformationData(0);
-		} else {
-					markerRoot.matrix.elements = arController.getTransformationData(0);
-				}
-
-	} else {
-		markerRoot.visible = false;
-	}
-
-	if (USE_SHADER) {
-		shaderMaterial.uniforms.cameraMatrix.value.fromArray(camera_mat);
-	} else {
-		camera.projectionMatrix.fromArray(camera_mat);
-	}
 }
 
 	// Render the scene.
@@ -177,8 +176,6 @@ function tick() {
 	renderer.render(scene, camera);
 
 	tick();
-
-	arController.debugSetup();
 });
 
 </script>

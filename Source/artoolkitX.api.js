@@ -304,7 +304,7 @@ import artoolkitXjs from "./artoolkitx.js";
     };
 
     ARController.prototype.getTransformationData = function (trackableUID) {
-      return this.trackables[trackableUID].transformation;
+      return this.transform_mat = this.trackables[trackableUID].transformation
     };
 
     // /**
