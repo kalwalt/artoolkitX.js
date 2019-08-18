@@ -136,6 +136,11 @@ var camera_mat = new Float32Array(16);
 					arController.debugSetup();
 					var markerNum=1;
 					if (markerNum > 0) {
+						if (markerRoot.visible) {
+							arController.getTransMatSquareCont(0, 1, 80, arController.getTransformationData(0), arController.getTransformationData(0));
+						} else {
+							arController.getTransMatSquare(0 /* Marker index */, 1 /* Marker width */,arController.getTransformationData(0));
+						}
 					markerRoot.visible = true;
 					if (USE_SHADER) {
 								arController.arglCameraViewRHf(arController.transMatToGLMat(arController.getTransformationData(0)), shaderMaterial.uniforms.transformationMatrix.value.elements);
@@ -146,7 +151,7 @@ var camera_mat = new Float32Array(16);
 				} else {
 					markerRoot.visible = false;
 				}
-				arController.getCameraMatrix(0.0, 100.0, camera_mat);
+				arController.getCameraMatrix(0.1, 1000.0, camera_mat);
 				if (USE_SHADER) {
 					//console.log(camera_mat);
 					shaderMaterial.uniforms.cameraMatrix.value.fromArray(camera_mat);
@@ -168,6 +173,7 @@ function tick() {
 	if (!arController) {
 		return;
 	}
+
 }
 
 	// Render the scene.
