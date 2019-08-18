@@ -284,7 +284,7 @@ import artoolkitXjs from "./artoolkitx.js";
             trackableId = artoolkitXjs.addTrackable(
                 trackableObj.trackableType + ";" + fileName + ";" + trackableObj.height
             );
-        } else if (trackableObj.trackableType.includes("NFT")) {
+        } else if (trackableObj.trackableType.includes("nft")) {
           console.log("we are in NFT");
           try{
             fileName = await  _loadTrackable(trackableObj.url);
