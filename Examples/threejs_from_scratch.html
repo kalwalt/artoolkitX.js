@@ -131,7 +131,8 @@ var camera_mat = new Float32Array(16);
 					interval = setInterval(function() {
 
 							arController.process(video);
-							var getMarker = arController.getMarker(0,0);
+							var marker = arController.getMarker(0,0);
+							console.log(marker);
 
 					}, 13);
 					ar1 = arController;
