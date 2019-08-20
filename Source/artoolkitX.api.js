@@ -400,6 +400,12 @@ import artoolkitXjs from "./artoolkitx.js";
          return glRhMatrix;
      }
 
+     ARController.prototype.getMarker = function (id, markerIndex){
+       if (0 === artoolkitXjs.getMarker(id, markerIndex)) {
+   			return artoolkitXjs.markerInfo;
+   		}
+     };
+
     //FIX
     // /**
     // 	Get the number of markers detected in a video frame.

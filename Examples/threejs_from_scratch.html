@@ -120,6 +120,7 @@ var camera_mat = new Float32Array(16);
 	arController.addEventListener('getMarker', (trackableInfo) => {
 			console.log("TrackableID: " + trackableInfo.data.trackableId);
 			//console.log(trackableInfo.data.transformation);
+
 	});
 
 	try {
@@ -130,6 +131,7 @@ var camera_mat = new Float32Array(16);
 					interval = setInterval(function() {
 
 							arController.process(video);
+							var getMarker = arController.getMarker(0,0);
 
 					}, 13);
 					ar1 = arController;
