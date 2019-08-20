@@ -104,7 +104,7 @@ var arController = new ARController(v, cameraParam);
 			const markerVisible = trackableInfo.visible;
 			markerRoot.visible = markerVisible;
 			if (USE_SHADER) {
-				shaderMaterial.uniforms.transformationMatrix.value.elements = transformation;
+				shaderMaterial.uniforms.transformationMatrix.value.fromArray(transformation);
 			  //arController.arglCameraViewRHf(transformation, shaderMaterial.uniforms.transformationMatrix.value.elements);
 			} else {
 				markerRoot.matrix.fromArray(transformation)
