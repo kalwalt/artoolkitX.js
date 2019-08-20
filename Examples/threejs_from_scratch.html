@@ -45,8 +45,8 @@ const cameraParam = './Data/camera_para.dat';
 
 const config = {
     cameraParam: cameraParam,
-    width: 640,
-    height: 480
+    width: 320,
+    height: 240
 };
 
 var trackable = {
@@ -55,11 +55,12 @@ var trackable = {
 }
 
 var ar1, interval;
+const USE_SHADER = true;
 
+window.addEventListener('artoolkitX-loaded', () => {
+var camera_mat = new Float32Array(16);
 var cMat = new THREE.Matrix4();
 var tMat = new THREE.Matrix4();
-
-var USE_SHADER = true;
 
 var shaderMaterial = new THREE.ShaderMaterial({
 	uniforms: {
@@ -69,19 +70,14 @@ var shaderMaterial = new THREE.ShaderMaterial({
 	vertexShader: vert.text,
 	fragmentShader: frag.text
 });
-
-
 var renderer = new THREE.WebGLRenderer();
 var scene = new THREE.Scene();
-
-renderer.setSize(v.width, v.height);
-
-document.body.appendChild(renderer.domElement);
-
 // Create a camera and a marker root object for your Three.js scene.
-var camera = new THREE.Camera();
+const camera = new THREE.PerspectiveCamera( 50, 320 /240, 0.0001, 100000 );
+camera.matrixAutoUpdate = false;
+const cameraRoot = new THREE.Object3D();
+cameraRoot.add(camera);
 scene.add(camera);
-
 
 var light = new THREE.PointLight(0xffffff);
 light.position.set(400, 500, 100);
@@ -97,97 +93,123 @@ markerRoot.markerMatrix = new Float64Array(16);
 markerRoot.matrixAutoUpdate = false;
 camera.matrixAutoUpdate = false;
 
-// Add the marker models and suchlike into your marker root object.
-
-var cube = new THREE.Mesh(
-	new THREE.BoxGeometry(1,1,1),
-	USE_SHADER ?
-		shaderMaterial :
-		new THREE.MeshLambertMaterial({ color: 0xffffff, wireframe: false })
-);
-markerRoot.add(cube);
-
 // Add the marker root to your scene.
 scene.add(markerRoot);
-
-
 var video = document.getElementById('v');
-var arController = new ARController(video, cameraParam);
-//var trackableInfo;
+var arController = new ARController(v, cameraParam);
 
-window.addEventListener('artoolkitX-loaded', () => {
-var camera_mat = new Float32Array(16);
 	arController.addEventListener('getMarker', (trackableInfo) => {
 			console.log("TrackableID: " + trackableInfo.data.trackableId);
-			//console.log(trackableInfo.data.transformation);
-
+			const transformation = trackableInfo.data.transformation;
+			const markerVisible = trackableInfo.visible;
+			markerRoot.visible = markerVisible;
+			if (USE_SHADER) {
+				shaderMaterial.uniforms.transformationMatrix.value.elements = transformation;
+			  //arController.arglCameraViewRHf(transformation, shaderMaterial.uniforms.transformationMatrix.value.elements);
+			} else {
+				markerRoot.matrix.fromArray(transformation)
+			}
 	});
-
+var video = document.getElementById('v');
 	try {
-			//arController.setLogLevel(1);
 			arController.start().then( () => {
 					console.log("start done");
+					renderer.setSize(v.width, v.height);
+
+					document.body.appendChild(renderer.domElement);
+					const camMatrix = arController.getCameraMatrix(0.0001, 100000);
+					const fovy = 2 * Math.atan(1 / camMatrix[5]) * 180 / Math.PI;
+					const vh = arController.videoHeight
+					const vw = arController.videoWidth
+					const cw = arController.canvas.width
+					const ch = arController.canvas.height
+
+					// if (vw < vh) {
+					//     camera.fov = Math.abs(fovy) * (vh / vw);
+					// } else {
+					//     if (cw / ch > vw / vh) {
+					//         // Video Y FOV is limited so we must limit 3D camera FOV to match
+					//         camera.fov = Math.abs(fovy) * (vw / vh) / (cw / ch);
+					//     } else {
+					//         // Video Y FOV is limited so we must limit 3D camera FOV to match
+					//         camera.fov = Math.abs(fovy);
+					//     }
+					// }
+					if (USE_SHADER) {
+						shaderMaterial.uniforms.cameraMatrix.value.fromArray(camMatrix);
+					} else {
+						camera.projectionMatrix.fromArray(camMatrix);
+						camera.updateProjectionMatrix();
+					}
+					var videoTex = new THREE.Texture(arController.image);
+					videoTex.minFilter = THREE.LinearFilter;
+					videoTex.flipY = false;
+
+					// Then create a plane textured with the video.
+					var plane = new THREE.Mesh(
+					new THREE.PlaneBufferGeometry(2, 2),
+					new THREE.MeshBasicMaterial({map: videoTex, side: THREE.DoubleSide})
+					);
+
+					// The video plane shouldn't care about the z-buffer.
+					plane.material.depthTest = false;
+					plane.material.depthWrite = false;
+
+					// Create a camera and a scene for the video plane and
+					// add the camera and the video plane to the scene.
+					var videoCamera = new THREE.OrthographicCamera(-1, 1, -1, 1, -1, 1);
+					var videoScene = new THREE.Scene();
+					videoScene.add(plane);
+					videoScene.add(videoCamera);
+
+					markerRoot.wasVisible = false;
+					markerRoot.markerMatrix = new Float64Array(16);
+					markerRoot.matrixAutoUpdate = false;
+
+					// Add the marker models and suchlike into your marker root object.
+					var cube = new THREE.Mesh(
+						new THREE.BoxGeometry(100,100,100),
+						USE_SHADER ?
+							shaderMaterial :
+							new THREE.MeshLambertMaterial({ color: 0xffffff, wireframe: false })
+					);
+					cube.position.z = 5;
+					markerRoot.add(cube);
+					markerRoot.visible = true;
+
 					var trackableId = arController.addTrackable(trackable);
+
 					interval = setInterval(function() {
 
 							arController.process(video);
-							var marker = arController.getMarker(0,0);
-							console.log(marker);
+							videoTex.needsUpdate = true;
+							const ac = renderer.autoClear;
+							renderer.autoClear = false;
+							renderer.clear();
+							renderer.render(videoScene, videoCamera);
+							renderer.render(scene, camera);
+							renderer.autoClear = ac;
 
 					}, 13);
 					ar1 = arController;
-					arController.debugSetup();
-					var markerNum=1;
-					if (markerNum > 0) {
-						if (markerRoot.visible) {
-							arController.getTransMatSquareCont(0, 1, 80, arController.getTransformationData(0), arController.getTransformationData(0));
-						} else {
-							arController.getTransMatSquare(0 /* Marker index */, 1 /* Marker width */,arController.getTransformationData(0));
-						}
-					markerRoot.visible = true;
-					if (USE_SHADER) {
-								arController.arglCameraViewRHf(arController.transMatToGLMat(arController.getTransformationData(0)), shaderMaterial.uniforms.transformationMatrix.value.elements);
-					} else {
-								arController.arglCameraViewRHf(arController.transMatToGLMat(arController.getTransformationData(0)), markerRoot.matrix.elements);
-							}
-
-				} else {
-					markerRoot.visible = false;
-				}
-				arController.getCameraMatrix(0.1, 1000.0, camera_mat);
-				if (USE_SHADER) {
-					//console.log(camera_mat);
-					shaderMaterial.uniforms.cameraMatrix.value.fromArray(camera_mat);
-				} else {
-					camera.projectionMatrix.fromArray(camera_mat);
-				}
-
+					
 			});
-
 	}
 	catch (e) {
 			console.log(e);
 	}
-
-// On every frame do the following:
-function tick() {
-	requestAnimationFrame(tick);
-
-	if (!arController) {
-		return;
-	}
-
-}
-
-	// Render the scene.
-	renderer.autoClear = false;
-	renderer.clear();
-	renderer.render(scene, camera);
-
-	tick();
 });
 
+window.closeVideo = function() {
+    if(ar1) {
+        ar1.dispose();
+        clearInterval(interval);
+    }
+    else {
+        console.error("Trying to close before opened");
+    }
+}
 </script>
-
+<div id='matrix'></div>
 </body>
 </html>
