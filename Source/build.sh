@@ -59,16 +59,16 @@ locate_artkX() {
 install_plugin() {
     VERSION=`cat ../version.txt`
     echo "Download lib"
-    
-    curl --location "https://github.com/artoolkitx/artoolkitx/releases/download/$VERSION/artoolkitX.js.zip" -o plugin.zip
-    unzip -o plugin.zip -d ../SDK/lib
-    rm plugin.zip
+
+    curl --location "https://github.com/augmentmy-world/artoolkitx/releases/download/$VERSION/artoolkitXjs.zip" -o $ARTOOLKITXJS_HOME/SDK/lib/plugin.zip
+    unzip -o $ARTOOLKITXJS_HOME/SDK/lib/plugin.zip -d $ARTOOLKITXJS_HOME/SDK/lib
+    rm $ARTOOLKITXJS_HOME/SDK/lib/plugin.zip
 }
 
 #### If a DEV build is running the script uses the path to artoolkitX source to build artoolkitX plugin-libraries from there
-#### If no dev build is running (default) the artoolkitX plugin-libraries are downloaded from GitHub release using the version provided 
+#### If no dev build is running (default) the artoolkitX plugin-libraries are downloaded from GitHub release using the version provided
 
-if [ $DEV ] ; then 
+if [ $DEV ] ; then
 
         locate_artkX
         cd $ARTOOLKITX_HOME/Source
@@ -80,7 +80,7 @@ if [ $DEV ] ; then
         fi
 
         cp $ARTOOLKITX_HOME/SDK/lib/artoolkitx.* $ARTOOLKITXJS_HOME/SDK/lib/
-else 
+else
     echo "start download of libs"
 
     # ======================================================================
