@@ -274,7 +274,7 @@ import artoolkitXjs from "./artoolkitx.js";
                 `${trackableObj.trackableType};${fileName}`
             );
         } else if (trackableObj.trackableType === "nft") {
-            fileName = await ARController[_loadNFTTrackable](trackableObj.url)
+            fileName = await ARController[_loadNFTTrackable2](trackableObj.url)
             //var filename = "./Data/pinball-data/pinball"
             trackableId = artoolkitXjs.addTrackable(
                 `${trackableObj.trackableType};${trackableObj.url}`
@@ -923,6 +923,7 @@ import artoolkitXjs from "./artoolkitx.js";
 const _ajax = Symbol('_ajax')
 const _loadTrackable = Symbol('_loadTrackable')
 const _loadNFTTrackable = Symbol('_loadNFTTrackable')
+const _loadNFTTrackable2 = Symbol('_loadNFTTrackable2')
 const _loadCameraParam = Symbol('_loadCameraParam')
 const _loadMultiTrackable = Symbol('_loadMultiTrackable')
 const _ajaxDependencies = Symbol('_ajaxDependencies')
@@ -1135,15 +1136,32 @@ const _parseMultiFile = Symbol('_parseMultiFile')
     }
 
     ARController[_loadNFTTrackable] = async (url) => {
+      const filename1 = "/nft_trackable_" + ARController._marker_count++;
+      const filename2 = "/nft_trackable_" + ARController._marker_count++;
+      const filename3 = "/nft_trackable_" + ARController._marker_count++;
+      try {
+          await ARController[_ajax](url + '.fset', filename1)
+            await ARController[_ajax](url + '.iset', filename2)
+              await  ARController[_ajax](url + '.fset3', filename3)
+
+      return filename1, filename2, filename3;
+      } catch (e) {
+          console.log(e);
+          return e;
+      }
+    }
+
+    ARController[_loadNFTTrackable2] = async (url) => {
       const filename = "/nft_trackable_" + ARController._marker_count++;
       try {
-          await ARController[_ajax](url + '.fset', filename).then(() => resolve(
-            ARController[_ajax](url + '.iset', filename).then(() => resolve(
-              ARController[_ajax](url + '.fset3', filename).then(() => resolve(
-              filename))
-          ))
-      ))
-      return filename;
+        const extensions = [ '.fset', '.iset', '.fset3']
+        const files = extensions.map(function (ext) {
+            return [url + ext,'pinball' + ext];
+        });
+        console.log(files);
+
+        await ARController[_ajaxDependencies](files);
+        return filename;
       } catch (e) {
           console.log(e);
           return e;
