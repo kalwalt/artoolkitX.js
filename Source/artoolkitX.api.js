@@ -273,30 +273,11 @@ import artoolkitXjs from "./artoolkitx.js";
             trackableId = artoolkitXjs.addTrackable(
                 `${trackableObj.trackableType};${fileName}`
             );
-        } else if (trackableObj.trackableType.includes("2D")) {
-          console.log("we are 2d");
-          try{
-            fileName = await _loadTrackable(trackableObj.url);
-            console.log(fileName);
-          } catch (e) {
-            throw "Error to load trackable: " + e;
-        }
+        } else if (trackableObj.trackableType === "nft") {
+            fileName = await ARController[_loadNFTTrackable](trackableObj.url)
+            //var filename = "./Data/pinball-data/pinball"
             trackableId = artoolkitXjs.addTrackable(
-                trackableObj.trackableType + ";" + fileName + ";" + trackableObj.height
-            );
-        } else if (trackableObj.trackableType.includes("nft")) {
-          console.log("we are in NFT");
-          try{
-            fileName = await  _loadTrackable(trackableObj.url);
-            console.log(fileName);
-          } catch (e) {
-            throw "Error to load trackable: " + e;
-        }
-            if (!this._patternDetection.template) {
-                this._patternDetection.template = true;
-                }
-            trackableId = artoolkitXjs.addTrackable(
-                trackableObj.trackableType + ";" + fileName + ";" + trackableObj.height
+                `${trackableObj.trackableType};${trackableObj.url}`
             );
         }
 
@@ -941,6 +922,7 @@ import artoolkitXjs from "./artoolkitx.js";
  */
 const _ajax = Symbol('_ajax')
 const _loadTrackable = Symbol('_loadTrackable')
+const _loadNFTTrackable = Symbol('_loadNFTTrackable')
 const _loadCameraParam = Symbol('_loadCameraParam')
 const _loadMultiTrackable = Symbol('_loadMultiTrackable')
 const _ajaxDependencies = Symbol('_ajaxDependencies')
@@ -1150,6 +1132,22 @@ const _parseMultiFile = Symbol('_parseMultiFile')
             console.log(e);
             return e;
         }
+    }
+
+    ARController[_loadNFTTrackable] = async (url) => {
+      const filename = "/nft_trackable_" + ARController._marker_count++;
+      try {
+          await ARController[_ajax](url + '.fset', filename).then(() => resolve(
+            ARController[_ajax](url + '.iset', filename).then(() => resolve(
+              ARController[_ajax](url + '.fset3', filename).then(() => resolve(
+              filename))
+          ))
+      ))
+      return filename;
+      } catch (e) {
+          console.log(e);
+          return e;
+      }
     }
 
     var _camera_count = 0;
