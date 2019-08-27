@@ -277,7 +277,8 @@ import artoolkitXjs from "./artoolkitx.js";
             fileName = await ARController[_loadNFTTrackable2](trackableObj.url)
             //var filename = "./Data/pinball-data/pinball"
             trackableId = artoolkitXjs.addTrackable(
-                `${trackableObj.trackableType};${trackableObj.url}`
+                //`${trackableObj.trackableType};${trackableObj.url}`
+                `${trackableObj.trackableType};${fileName}`
             );
         }
 
@@ -1151,22 +1152,39 @@ const _parseMultiFile = Symbol('_parseMultiFile')
       }
     }
 
-    ARController[_loadNFTTrackable2] = async (url) => {
+  /*  ARController[_loadNFTTrackable2] = async (url) => {
       const filename = "/nft_trackable_" + ARController._marker_count++;
       try {
+
         const extensions = [ '.fset', '.iset', '.fset3']
         const files = extensions.map(function (ext) {
-            return [url + ext,'pinball' + ext];
+
+            return [url + ext,'pinball' + filename];
         });
         console.log(files);
 
-        await ARController[_ajaxDependencies](files);
+        ARController[_ajaxDependencies](files);
         return filename;
       } catch (e) {
           console.log(e);
           return e;
       }
-    }
+    }*/
+
+    ARController[_loadNFTTrackable2] = async (url) => {
+      return new Promise((resolve, reject) => {
+        const filename = "/nft_trackable_" + ARController._marker_count++;
+            if (url) {
+              ARController[_ajax](url + '.fset', filename).then(() => resolve(filename)).catch(e => { reject(e) })
+                    if (resolve) {
+                      return new Promise((resolve, reject) => {
+                    const filename = "/nft_trackable_" + ARController._marker_count++ ;
+                    ARController[_ajax](url + '.iset', filename).then(() => resolve(filename)).catch(e => { reject(e) })
+                  });
+              }
+            }
+          });
+      };
 
     var _camera_count = 0;
     ARController[_loadCameraParam] = (url) => {
