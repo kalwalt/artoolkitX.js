@@ -24,7 +24,7 @@ window.artoolkitX_wasm_url = '../SDK/lib/artoolkitx.wasm';
         trackableType: "single_barcode",
         barcodeId: 1
     }
-    
+
     window.addEventListener('artoolkitX-loaded', () => {
       //set some global properties
       var cam_pos = [0,10,10];
@@ -35,25 +35,26 @@ window.artoolkitX_wasm_url = '../SDK/lib/artoolkitx.wasm';
       var model = mat4.create();
       var mvp = mat4.create();
       var temp = mat4.create();
-      
+      var transformationMatrix = mat4.create();
+      var modelFinal = mat4.create();
+
       var container = document.body;
       var gl = GL.create({width:320, height:240});
-      container.appendChild(gl.canvas);    
-    
+      container.appendChild(gl.canvas);
+
     var arController = new ARController(v, cameraParam);
     arController.addEventListener('getMarker', (trackableInfo) => {
         //console.log("TrackableID: " + trackableInfo.data.trackableId);
         const transformation = trackableInfo.data.transformation;
         const markerVisible = trackableInfo.visible;
-        //console.log(model);
-        //model = transformation;
+        transformationMatrix = transformation;
     });
     var video = document.getElementById('v');
     try {
         arController.start().then( () => {
             console.log("start done");
             var trackableId = arController.addTrackable(trackable);
-            //basic phong shader
+            //basic phong shader //gl_Position = u_mvp * vec4(a_vertex,1.0);\
             var shader = new Shader('\
               precision highp float;\
               attribute vec3 a_vertex;\
@@ -61,8 +62,9 @@ window.artoolkitX_wasm_url = '../SDK/lib/artoolkitx.wasm';
               varying vec3 v_normal;\
               uniform mat4 u_mvp;\
               uniform mat4 u_model;\
+              uniform mat4 u_transfM;\
               void main() {\
-                v_normal = (u_model * vec4(a_normal,0.0)).xyz;\
+                v_normal = (u_model * u_transfM * vec4(a_normal,0.0)).xyz;\
                 gl_Position = u_mvp * vec4(a_vertex,1.0);\
               }\
               ', '\
@@ -79,7 +81,7 @@ window.artoolkitX_wasm_url = '../SDK/lib/artoolkitx.wasm';
                 gl_FragColor = u_color * max(0.0, NdotL);\
               }\
             ');
-            
+
             interval = setInterval(function() {
                 arController.process(video);
                 //load a mesh (cube)
@@ -90,17 +92,24 @@ window.artoolkitX_wasm_url = '../SDK/lib/artoolkitx.wasm';
                 //generic gl flags and settings
                 gl.clearColor(0.1,0.1,0.1,1);
                 gl.enable( gl.DEPTH_TEST );
-                
-                //const camMatrix = arController.getCameraMatrix(0.1, 1000);
-              
+
+                const camMatrix = arController.getCameraMatrix(0.1, 1000);
+                //console.log(model);
+                //arController.arglCameraViewRHf(arController.transMatToGLMat(transformationMatrix), shader.uniforms.u_model);
                 gl.animate();
                 gl.ondraw = function()
                 {
                 	gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
                 	mat4.lookAt(view, cam_pos, cam_center, [0,1,0]);
                 	//create modelview and projection matrices
+                  //mat4.multiply(temp,camMatrix,model);
                 	mat4.multiply(temp,view,model);
+
+                  //mat4.multiply(temp,view,transformationMatrix);
                 	mat4.multiply(mvp,proj,temp);
+                  //mat4.multiply(mvp,camMatrix,temp);
+                  //mat4.multiply(mvp,proj,camMatrix);
+                  //mat4.multiply(modelFinal, model, transformationMatrix)
                   //render mesh using the shader
                 	if(mesh)
                   {
@@ -109,18 +118,19 @@ window.artoolkitX_wasm_url = '../SDK/lib/artoolkitx.wasm';
                 			u_lightvector: vec3.normalize(vec3.create(),[1,1,1]),
                 			u_camera_position: cam_pos,
                 			u_model: model,
-                			u_mvp: mvp
+                			u_mvp: mvp,
+                      u_transfM: transformationMatrix
                 		}).draw(mesh); //draw mesh
                     };
                 }
-                gl.onupdate = function (){              
+                gl.onupdate = function (){
                 }
               }, 13);
               ar1 = arController;
           })
-        }  
+        }
         catch (e) {
-            console.log(e); 
+            console.log(e);
   }
 });
     </script>
