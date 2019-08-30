@@ -1188,18 +1188,18 @@ const _parseMultiFile = Symbol('_parseMultiFile')
 
       ARController[_loadNFTTrackable2] = (path) => {
         const urls = [ `${path}.fset`, `${path}.iset`, `${path}.fset3`];
-        //const filename = "/nft_trackable_" + ARController._marker_count++;
+        const filename = "/nft_trackable_" + ARController._marker_count++;
         return Promise.all(urls.map(url =>
                     fetch(url)
                       .then(_checkStatus)
                       .catch(error => console.log('There was a problem!', error))
                   )).then(data => {
                     console.log(data[0].url);
-                    const filename = "/nft_trackable_" + ARController._marker_count++;
+                    //const filename = "/nft_trackable_" + ARController._marker_count++;
                     data.map(item =>
                     ARController[_ajax](item.url, filename).then(() => Promise.resolve(filename)).catch(e => { Promise.reject(e) }),
                     console.log("nft loaded"))
-                  })
+                  }).then(() => Promise.resolve(filename)).catch(e => { Promise.reject(e) })
         }
 
       var _checkStatus = async(response) => {
