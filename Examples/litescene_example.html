@@ -100,7 +100,10 @@ var APP = {
     var now = new Date().getTime();
     camera.setCustomProjectionMatrix(camMatrix);
     main.updateMatrix = true;
+    main.mustUpdate = true;
     main.transform.applyTransformMatrix(mat);
+    LS.GlobalScene.root.updateMatrix = true;
+
     
     LS.GlobalScene.update(dt);
   },
