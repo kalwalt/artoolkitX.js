@@ -9,7 +9,7 @@
     * { margin: 0; padding: 0; }
   </style>
 <script type="text/javascript">
-var main;
+var main, camera;
 var APP = {
   cam_dist: 10,
 
@@ -46,7 +46,7 @@ var APP = {
     camera.center = [0,35,0];
     camera.eye = [150,40,150];
     camera.far = 1000;
-    camera.near = 1;
+    camera.near = 0.1;
     
     //light
     var light = LS.GlobalScene.getLight();
@@ -74,7 +74,7 @@ var APP = {
             color: "empty-screen.png" }});
     node.setMesh("screen.obj");
     main.addChild(node);
-    
+  
     //example of forward render function to inject draw calls into the scene
     LS.Renderer.onRenderScene = function(camera)
     {
@@ -86,21 +86,21 @@ var APP = {
     //load resources
     LS.GlobalScene.loadResources();  
   },
-  ondraw: function(camMatrix, mat)
+  ondraw: function()
   {
     //move the camera a little bit
     var idle = 0.2 * Math.sin(new Date().getTime() * 0.0005);
-    var camera = LS.GlobalScene.getCamera();
-    camera.eye = [5 * (APP.cam_dist + idle),40, -20 * (APP.cam_dist + idle)];
-    camera.setCustomProjectionMatrix(camMatrix);
-    main.updateMatrix = true;
-    main.transform.applyTransformMatrix(mat);
+    camera = LS.GlobalScene.getCamera();
+    //camera.eye = [5 * (APP.cam_dist + idle),40, -20 * (APP.cam_dist + idle)];
     //render the scene (it uses LS.GlobalScene as default)
     LS.Renderer.render();
   },
-  onupdate: function(dt)
+  onupdate: function(dt, camMatrix, mat)
   {
     var now = new Date().getTime();
+    camera.setCustomProjectionMatrix(camMatrix);
+    main.updateMatrix = true;
+    main.transform.applyTransformMatrix(mat);
     
     LS.GlobalScene.update(dt);
   },
@@ -153,8 +153,8 @@ window.artoolkitX_wasm_url = '../SDK/lib/artoolkitx.wasm';
             interval = setInterval(function() {
                 arController.process(video);
                 const camMatrix = arController.getCameraMatrix(0.1, 1000);
-                APP.ondraw(camMatrix, transformationMatrix);
-              
+                APP.ondraw();
+                APP.onupdate(0.01, camMatrix, transformationMatrix);          
               }, 13);
               ar1 = arController;
           })
