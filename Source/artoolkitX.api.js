@@ -1171,7 +1171,7 @@ const _parseMultiFile = Symbol('_parseMultiFile')
       }
     }*/
 
-    ARController[_loadNFTTrackable2] = async (url) => {
+    /*ARController[_loadNFTTrackable2] = async (url) => {
       return new Promise((resolve, reject) => {
         const filename = "/nft_trackable_" + ARController._marker_count++;
             if (url) {
@@ -1184,7 +1184,21 @@ const _parseMultiFile = Symbol('_parseMultiFile')
               }
             }
           });
-      };
+      };*/
+
+      ARController[_loadNFTTrackable2] = async (path) => {
+        const urls = [ '${path}.fset', '${path}.iset', '${path}.fset3'];
+        return Promise.all(urls.map(url =>
+                    fetch(url)
+                      .then(checkStatus)
+                      .then(parseJSON)
+                      .catch(logError)
+                  )).then(console.log("nft loaded"))
+
+        }
+
+
+      }
 
     var _camera_count = 0;
     ARController[_loadCameraParam] = (url) => {
