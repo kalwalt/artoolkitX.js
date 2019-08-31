@@ -275,7 +275,7 @@ import artoolkitXjs from "./artoolkitx.js";
             );
         } else if (trackableObj.trackableType === "nft") {
             fileName = await ARController[_loadNFTTrackable2](trackableObj.url)
-            //var filename = "./Data/pinball-data/pinball"
+            //filename = "./Data/pinball-data/pinball."
             trackableId = artoolkitXjs.addTrackable(
                 //`${trackableObj.trackableType};${trackableObj.url}`
                 `${trackableObj.trackableType};${fileName}`
@@ -1186,7 +1186,7 @@ const _parseMultiFile = Symbol('_parseMultiFile')
           });
       };*/
 
-      ARController[_loadNFTTrackable2] = (path) => {
+      /*ARController[_loadNFTTrackable2] = (path) => {
         const urls = [ `${path}.fset`, `${path}.iset`, `${path}.fset3`];
         const filename = "/nft_trackable_" + ARController._marker_count++;
         return Promise.all(urls.map(url =>
@@ -1208,7 +1208,38 @@ const _parseMultiFile = Symbol('_parseMultiFile')
         } else {
           return Promise.reject(new Error(response.statusText));
         }
-      };
+      };*/
+
+    /*  ARController[_loadNFTTrackable2] = async (path) => {
+        const urls = [ `${path}.fset`, `${path}.iset`, `${path}.fset3`];
+        //const filename = "/nft_trackable_" + ARController._marker_count++;
+        const requests = urls.map((url) => {
+          //console.log(filename);
+              const filename = "/nft_trackable_" + ARController._marker_count++;
+              ARController[_ajax](url, filename);
+              return filename;
+              //console.log(filename)
+              //return filename
+            })
+            return Promise.all(requests).catch(e => console.log(`Error in Promise all!`));
+        };*/
+
+        ARController[_loadNFTTrackable2] = async (url) => {
+          const filename1 = "/nft_trackable_" + ARController._marker_count++;
+          const filename2 = "/nft_trackable_" + ARController._marker_count++;
+          const filename3 = "/nft_trackable_" + ARController._marker_count++;
+          const request1 = await ARController[_ajax](url + '.fset', filename1)
+          return filename1;
+          const request2 = await ARController[_ajax](url + '.iset', filename2)
+          return filename2;
+          const request3 = await ARController[_ajax](url + '.fset3', filename3)
+          return filename3;
+
+              return await Promise.all(request1, request2, request3).catch(e => console.log(`Error in Promise all!`));
+          };
+
+
+
 
 
     var _camera_count = 0;
