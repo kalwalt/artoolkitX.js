@@ -922,6 +922,7 @@ import artoolkitXjs from "./artoolkitx.js";
  * Defining private statics
  */
 const _ajax = Symbol('_ajax')
+const _writeByteArrayToFS = Symbol('_writeByteArrayToFS')
 const _loadTrackable = Symbol('_loadTrackable')
 const _loadNFTTrackable = Symbol('_loadNFTTrackable')
 const _loadNFTTrackable2 = Symbol('_loadNFTTrackable2')
@@ -934,7 +935,7 @@ const _parseMultiFile = Symbol('_parseMultiFile')
     //  ajax('../bin/Data2/markers.dat', '/Data2/markers.dat', callback);
     //  ajax('../bin/Data/patt.hiro', '/patt.hiro', callback);
     // Promise enabled: https://stackoverflow.com/a/48969580/5843642
-    ARController[_ajax] = (url, target) => {
+    ARController[_ajax] = (url, target, callback) => {
         return new Promise((resolve, reject) => {
             var oReq = new XMLHttpRequest();
             oReq.open("GET", url, true);
@@ -945,7 +946,8 @@ const _parseMultiFile = Symbol('_parseMultiFile')
                     // console.log('ajax done for ', url);
                     var arrayBuffer = oReq.response;
                     var byteArray = new Uint8Array(arrayBuffer);
-                    artoolkitXjs.FS.writeFile(target, byteArray, { encoding: "binary" });
+                    ARController[_writeByteArrayToFS](target, byteArray)
+                    //artoolkitXjs.FS.writeFile(target, byteArray, { encoding: "binary" });
                     resolve(byteArray);
                 } else {
                     reject(this.status);
@@ -954,6 +956,14 @@ const _parseMultiFile = Symbol('_parseMultiFile')
             oReq.send();
         });
     }
+
+    ARController[_writeByteArrayToFS] = (target, byteArray) => {
+    //function writeByteArrayToFS(target, byteArray, callback) {
+  		artoolkitXjs.FS.writeFile(target, byteArray, { encoding: 'binary' });
+  		// console.log('FS written', target);
+
+  		//callback(byteArray);
+  	}
 
     // static
 
@@ -1128,7 +1138,7 @@ const _parseMultiFile = Symbol('_parseMultiFile')
     ARController[_loadTrackable] = async (url) => {
         var filename = "/trackable_" + _marker_count++;
         try {
-            await ARController[_ajax](url, filename);
+            await ARController[_ajax](url, filename, callback);
             return filename;
         } catch (e) {
             console.log(e);
@@ -1136,7 +1146,7 @@ const _parseMultiFile = Symbol('_parseMultiFile')
         }
     }
 
-    ARController[_loadNFTTrackable] = async (url) => {
+  /*  ARController[_loadNFTTrackable] = async (url) => {
       const filename1 = "/nft_trackable_" + ARController._marker_count++;
       const filename2 = "/nft_trackable_" + ARController._marker_count++;
       const filename3 = "/nft_trackable_" + ARController._marker_count++;
@@ -1150,7 +1160,7 @@ const _parseMultiFile = Symbol('_parseMultiFile')
           console.log(e);
           return e;
       }
-    }
+    }*/
 
   /*  ARController[_loadNFTTrackable2] = async (url) => {
       const filename = "/nft_trackable_" + ARController._marker_count++;
@@ -1228,14 +1238,13 @@ const _parseMultiFile = Symbol('_parseMultiFile')
           const filename1 = "/nft_trackable_" + ARController._marker_count++;
           const filename2 = "/nft_trackable_" + ARController._marker_count++;
           const filename3 = "/nft_trackable_" + ARController._marker_count++;
-          const request1 = await ARController[_ajax](url + '.fset', filename1)
-          return filename1;
-          const request2 = await ARController[_ajax](url + '.iset', filename2)
-          return filename2;
-          const request3 = await ARController[_ajax](url + '.fset3', filename3)
-          return filename3;
-
-              return await Promise.all(request1, request2, request3).catch(e => console.log(`Error in Promise all!`));
+          await ARController[_ajax](url + '.fset', filename1,
+                await ARController[_ajax](url + '.iset', filename2,
+                  await ARController[_ajax](url + '.fset3', filename3, () => onSuccess())
+                  )
+                )
+              //return await Promise.all(request).catch(e => console.log(`Error in Promise all!`));
+              return filename1;
           };
 
 
