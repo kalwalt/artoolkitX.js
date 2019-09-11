@@ -1112,6 +1112,7 @@ const _loadCameraParam = Symbol('_loadCameraParam')
 const _loadMultiTrackable = Symbol('_loadMultiTrackable')
 const _ajaxDependencies = Symbol('_ajaxDependencies')
 const _parseMultiFile = Symbol('_parseMultiFile')
+const _mapFiles = Symbol('_mapFiles')
 
 // Eg.
 //  ajax('../bin/Data2/markers.dat', '/Data2/markers.dat', callback);
@@ -1171,7 +1172,7 @@ ARController[_loadMultiTrackable] = async (url) => {
   const filename = '/multi_trackable_' + ARController._multi_marker_count++
   try {
     const bytes = await ARController[_ajax](url, filename)
-    let files = ARController[_parseMultiFile](bytes)
+    let files = await ARController[_parseMultiFile](bytes)
 
     // function ok() {
     //     var markerID = Module._addMultiMarker(arId, filename);
@@ -1180,17 +1181,24 @@ ARController[_loadMultiTrackable] = async (url) => {
     // }
 
     // if (!files.length) return ok();
-
-    const path = url.split('/').slice(0, -1).join('/')
-    files = files.map(function (file) {
-      return [path + '/' + file, file]
-    })
+    console.log(files);
+    await ARController[_mapFiles](url, files)
+    return files
 
     await ARController[_ajaxDependencies](files)
     return filename
   } catch (error) {
     throw new Error('Error loading multi marker: ' + error)
   }
+}
+
+ARController[_mapFiles] = async (url, files) => {
+  const path = url.split('/').slice(0, -1).join('/');
+  let final;
+  return new Promise.map(files, function(file) {
+      return final = [path + '/' + file, file]
+
+    }).then(() => resolve(final)).catch(e => { reject(e) })
 }
 
 ARController[_ajaxDependencies] = async (files) => {
@@ -1201,7 +1209,7 @@ ARController[_ajaxDependencies] = async (files) => {
   }
 }
 
- ARController[_parseMultiFile] = (bytes) => {
+ARController[_parseMultiFile] = async (bytes) => {
    const str = String.fromCharCode.apply(String, bytes) // basically bytesToString
    const lines = str.split('\n')
    const files = []
