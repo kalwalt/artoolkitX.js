@@ -1194,9 +1194,8 @@ ARController[_loadMultiTrackable] = async (url) => {
 
 ARController[_mapFiles] = async (url, files) => {
   const path = url.split('/').slice(0, -1).join('/');
-  let final;
-  return new Promise.map(files, function(file) {
-      return final = [path + '/' + file, file]
+  return files.map(function(file) {
+      return [path + '/' + file, file]
     })
 }
 
