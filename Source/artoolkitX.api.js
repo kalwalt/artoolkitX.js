@@ -1181,9 +1181,8 @@ ARController[_loadMultiTrackable] = async (url) => {
     // }
 
     // if (!files.length) return ok();
-    console.log(files);
-    await ARController[_mapFiles](url, files)
-    return files
+    //console.log(files);
+    files = await ARController[_mapFiles](url, files)
 
     await ARController[_ajaxDependencies](files)
     return filename
