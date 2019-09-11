@@ -1197,8 +1197,7 @@ ARController[_mapFiles] = async (url, files) => {
   let final;
   return new Promise.map(files, function(file) {
       return final = [path + '/' + file, file]
-
-    }).then(() => resolve(final)).catch(e => { reject(e) })
+    })
 }
 
 ARController[_ajaxDependencies] = async (files) => {
