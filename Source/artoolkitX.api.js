@@ -1156,7 +1156,7 @@ const _parseMultiFile = Symbol('_parseMultiFile')
               await  ARController[_ajax](url + '.fset3', filename3)
 
       return filename1, filename2, filename3;
-      } catch (e) {
+    } catch (e) {try {
           console.log(e);
           return e;
       }
@@ -1234,10 +1234,10 @@ const _parseMultiFile = Symbol('_parseMultiFile')
             return Promise.all(requests).catch(e => console.log(`Error in Promise all!`));
         };*/
 
-        ARController[_loadNFTTrackable2] = async (url) => {
-          const filename1 = "/nft_trackable_" + ARController._marker_count++;
-          const filename2 = "/nft_trackable_" + ARController._marker_count++;
-          const filename3 = "/nft_trackable_" + ARController._marker_count++;
+        /*ARController[_loadNFTTrackable2] = async (url) => {
+          const filename1 = "/nft_trackable_" + '0';
+          const filename2 = "/nft_trackable_" + '1';
+          const filename3 = "/nft_trackable_" + '2';
           await ARController[_ajax](url + '.fset', filename1,
                 await ARController[_ajax](url + '.iset', filename2,
                   await ARController[_ajax](url + '.fset3', filename3, () => onSuccess())
@@ -1245,7 +1245,22 @@ const _parseMultiFile = Symbol('_parseMultiFile')
                 )
               //return await Promise.all(request).catch(e => console.log(`Error in Promise all!`));
               return filename1;
-          };
+          };*/
+
+          ARController[_loadNFTTrackable2] = async (url) => {
+            const filename = "/nft_trackable_0";
+            try {
+             ARController[_ajax](url + '.fset', filename).then(
+                ARController[_ajax](url + '.iset', filename).then(
+                await  ARController[_ajax](url + '.fset3', filename)
+                   )
+                  )
+                  return filename;
+                } catch (e) {
+                    console.log(e);
+                    return e;
+                }
+            };
 
 
 
