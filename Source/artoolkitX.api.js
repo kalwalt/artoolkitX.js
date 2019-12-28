@@ -1247,12 +1247,12 @@ const _parseMultiFile = Symbol('_parseMultiFile')
               return filename1;
           };*/
 
-          ARController[_loadNFTTrackable2] = async (url) => {
+      /*    ARController[_loadNFTTrackable2] = async (url) => {
             const filename = "/nft_trackable_0";
             try {
-             ARController[_ajax](url + '.fset', filename).then(
-                ARController[_ajax](url + '.iset', filename).then(
-                await  ARController[_ajax](url + '.fset3', filename)
+              ARController[_ajax](url + '.fset', filename).then(
+                 ARController[_ajax](url + '.iset', filename).then(
+                 await  ARController[_ajax](url + '.fset3', filename)
                    )
                   )
                   return filename;
@@ -1260,7 +1260,22 @@ const _parseMultiFile = Symbol('_parseMultiFile')
                     console.log(e);
                     return e;
                 }
-            };
+            };*/
+
+            ARController[_loadNFTTrackable2] = async (url) => {
+              const filename = "/nft_trackable_";
+              try {
+              await ARController[_ajax](url + '.fset', filename + '.fset').then(
+                  await ARController[_ajax](url + '.iset', filename + '.iset').then(
+                    await ARController[_ajax](url + '.fset3', filename + '.fset3')
+                     )
+                    )
+                    return filename;
+                  } catch (e) {
+                      console.log(e);
+                      return e;
+                  }
+              };
 
 
 
