@@ -274,10 +274,8 @@ import artoolkitXjs from "./artoolkitx.js";
                 `${trackableObj.trackableType};${fileName}`
             );
         } else if (trackableObj.trackableType === "nft") {
-            fileName = await ARController[_loadNFTTrackable2](trackableObj.url)
-            //filename = "./Data/pinball-data/pinball."
+            fileName = await ARController[_loadNFTTrackable](trackableObj.url)
             trackableId = artoolkitXjs.addTrackable(
-                //`${trackableObj.trackableType};${trackableObj.url}`
                 `${trackableObj.trackableType};${fileName}`
             );
         }
@@ -925,7 +923,6 @@ const _ajax = Symbol('_ajax')
 const _writeByteArrayToFS = Symbol('_writeByteArrayToFS')
 const _loadTrackable = Symbol('_loadTrackable')
 const _loadNFTTrackable = Symbol('_loadNFTTrackable')
-const _loadNFTTrackable2 = Symbol('_loadNFTTrackable2')
 const _loadCameraParam = Symbol('_loadCameraParam')
 const _loadMultiTrackable = Symbol('_loadMultiTrackable')
 const _ajaxDependencies = Symbol('_ajaxDependencies')
@@ -1144,138 +1141,22 @@ const _parseMultiFile = Symbol('_parseMultiFile')
             console.log(e);
             return e;
         }
-    }
+    };
 
-  /*  ARController[_loadNFTTrackable] = async (url) => {
-      const filename1 = "/nft_trackable_" + ARController._marker_count++;
-      const filename2 = "/nft_trackable_" + ARController._marker_count++;
-      const filename3 = "/nft_trackable_" + ARController._marker_count++;
-      try {
-          await ARController[_ajax](url + '.fset', filename1)
-            await ARController[_ajax](url + '.iset', filename2)
-              await  ARController[_ajax](url + '.fset3', filename3)
-
-      return filename1, filename2, filename3;
-    } catch (e) {try {
-          console.log(e);
-          return e;
-      }
-    }*/
-
-  /*  ARController[_loadNFTTrackable2] = async (url) => {
-      const filename = "/nft_trackable_" + ARController._marker_count++;
-      try {
-
-        const extensions = [ '.fset', '.iset', '.fset3']
-        const files = extensions.map(function (ext) {
-
-            return [url + ext,'pinball' + filename];
-        });
-        console.log(files);
-
-        ARController[_ajaxDependencies](files);
-        return filename;
-      } catch (e) {
-          console.log(e);
-          return e;
-      }
-    }*/
-
-    /*ARController[_loadNFTTrackable2] = async (url) => {
-      return new Promise((resolve, reject) => {
-        const filename = "/nft_trackable_" + ARController._marker_count++;
-            if (url) {
-              ARController[_ajax](url + '.fset', filename).then(() => resolve(filename)).catch(e => { reject(e) })
-                    if (resolve) {
-                      return new Promise((resolve, reject) => {
-                    const filename = "/nft_trackable_" + ARController._marker_count++ ;
-                    ARController[_ajax](url + '.iset', filename).then(() => resolve(filename)).catch(e => { reject(e) })
-                  });
-              }
-            }
-          });
-      };*/
-
-      /*ARController[_loadNFTTrackable2] = (path) => {
-        const urls = [ `${path}.fset`, `${path}.iset`, `${path}.fset3`];
-        const filename = "/nft_trackable_" + ARController._marker_count++;
-        return Promise.all(urls.map(url =>
-                    fetch(url)
-                      .then(_checkStatus)
-                      .catch(error => console.log('There was a problem!', error))
-                  )).then(data => {
-                    console.log(data[0].url);
-                    //const filename = "/nft_trackable_" + ARController._marker_count++;
-                    data.map(item =>
-                    ARController[_ajax](item.url, filename).then(() => Promise.resolve(filename)).catch(e => { Promise.reject(e) }),
-                    console.log("nft loaded"))
-                  }).then(() => Promise.resolve(filename)).catch(e => { Promise.reject(e) })
-        }
-
-      var _checkStatus = async(response) => {
-                if (response.ok) {
-          return Promise.resolve(response);
-        } else {
-          return Promise.reject(new Error(response.statusText));
-        }
-      };*/
-
-    /*  ARController[_loadNFTTrackable2] = async (path) => {
-        const urls = [ `${path}.fset`, `${path}.iset`, `${path}.fset3`];
-        //const filename = "/nft_trackable_" + ARController._marker_count++;
-        const requests = urls.map((url) => {
-          //console.log(filename);
-              const filename = "/nft_trackable_" + ARController._marker_count++;
-              ARController[_ajax](url, filename);
-              return filename;
-              //console.log(filename)
-              //return filename
-            })
-            return Promise.all(requests).catch(e => console.log(`Error in Promise all!`));
-        };*/
-
-        /*ARController[_loadNFTTrackable2] = async (url) => {
-          const filename1 = "/nft_trackable_" + '0';
-          const filename2 = "/nft_trackable_" + '1';
-          const filename3 = "/nft_trackable_" + '2';
-          await ARController[_ajax](url + '.fset', filename1,
-                await ARController[_ajax](url + '.iset', filename2,
-                  await ARController[_ajax](url + '.fset3', filename3, () => onSuccess())
-                  )
-                )
-              //return await Promise.all(request).catch(e => console.log(`Error in Promise all!`));
-              return filename1;
-          };*/
-
-      /*    ARController[_loadNFTTrackable2] = async (url) => {
-            const filename = "/nft_trackable_0";
-            try {
-              ARController[_ajax](url + '.fset', filename).then(
-                 ARController[_ajax](url + '.iset', filename).then(
-                 await  ARController[_ajax](url + '.fset3', filename)
-                   )
+    ARController[_loadNFTTrackable] = async (url) => {
+        const filename = "/nft_trackable_0";
+        try {
+            await ARController[_ajax](url + '.fset', filename + '.fset').then(
+              await ARController[_ajax](url + '.iset', filename + '.iset').then(
+                  await ARController[_ajax](url + '.fset3', filename + '.fset3')
+                    )
                   )
                   return filename;
-                } catch (e) {
-                    console.log(e);
-                    return e;
+              } catch (e) {
+                  console.log(e);
+                  return e;
                 }
-            };*/
-
-            ARController[_loadNFTTrackable2] = async (url) => {
-              const filename = "/nft_trackable_";
-              try {
-              await ARController[_ajax](url + '.fset', filename + '.fset').then(
-                  await ARController[_ajax](url + '.iset', filename + '.iset').then(
-                    await ARController[_ajax](url + '.fset3', filename + '.fset3')
-                     )
-                    )
-                    return filename;
-                  } catch (e) {
-                      console.log(e);
-                      return e;
-                  }
-              };
+      };
 
 
 
