@@ -1,4 +1,4 @@
 [submodule "Source/extras/artoolkitx"]
 	path = Source/extras/artoolkitx
-	url = git@github.com:augmentmy-world/artoolkitx.git
+	url = git@github.com:kalwalt/artoolkitx.git
   branch = emscripten
