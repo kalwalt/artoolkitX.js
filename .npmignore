@@ -1,2 +1,2 @@
-SDK/lib
-Source/extras
+SDK/lib/*
+Source/extras/*
