@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:kalwalt/artoolkitX.js.git"
+    "url": "git@github.com/kalwalt/artoolkitX.js/tree/npm-package.git"
   },
   "keywords": [
     "artoolkitX",
