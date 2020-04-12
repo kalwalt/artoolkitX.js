@@ -60,7 +60,7 @@ install_plugin() {
     VERSION=`cat ../version.txt`
     echo "Download lib"
 
-    curl --location "https://github.com/augmentmy-world/artoolkitx/releases/download/$VERSION/artoolkitXjs.zip" -o $ARTOOLKITXJS_HOME/SDK/lib/plugin.zip
+    curl --location "https://github.com/kalwalt/artoolkitx/releases/download/$VERSION/artoolkitXjs.zip" -o $ARTOOLKITXJS_HOME/SDK/lib/plugin.zip
     unzip -o $ARTOOLKITXJS_HOME/SDK/lib/plugin.zip -d $ARTOOLKITXJS_HOME/SDK/lib
     rm $ARTOOLKITXJS_HOME/SDK/lib/plugin.zip
 }
